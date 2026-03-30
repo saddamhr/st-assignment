@@ -1,4 +1,4 @@
-import { PAGE_SIZE, PRODUCT_FETCH_RETRY_ATTEMPTS, PRODUCT_FETCH_RETRY_DELAY_MS } from '../constants/catalog';
+import { PAGE_SIZE, PRODUCT_FETCH_RETRY_ATTEMPTS, PRODUCT_FETCH_RETRY_DELAY_MS } from '../constants/products';
 import { api } from './api';
 
 function wait(ms: number) {
