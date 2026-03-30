@@ -1,5 +1,6 @@
 import { AlertCircle, Loader2, Search } from 'lucide-react';
-import { ProductCard, ProductCardSkeleton } from '../../../components/ProductCard';
+import { ProductCard } from '../../../components/ProductCard';
+import { ProductCardSkeleton } from '../../../components/ProductCardSkeleton';
 import { PAGE_SIZE } from '../../../constants/products';
 import { Controls } from '../components/Controls';
 import { Header } from '../components/Header';

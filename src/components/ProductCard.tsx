@@ -1,12 +1,5 @@
-import type { Product } from '../types/product';
-
-const priceFormatter = new Intl.NumberFormat('en-BD', {
-  maximumFractionDigits: 0,
-});
-
-type ProductCardProps = {
-  product: Product;
-};
+import type { ProductCardProps } from '../types/productCard';
+import { formatPrice } from '../utils/formatPrice';
 
 export function ProductCard({ product }: ProductCardProps) {
   return (
@@ -20,25 +13,9 @@ export function ProductCard({ product }: ProductCardProps) {
         <p className="product-card__description clamp-2">{product.description}</p>
 
         <div className="product-card__priceRow">
-          <span className="product-card__price">
-            &#2547; {priceFormatter.format(product.price * 100)}
-          </span>
+          <span className="product-card__price">{formatPrice(product.price * 100)}</span>
         </div>
       </div>
     </article>
-  );
-}
-
-export function ProductCardSkeleton() {
-  return (
-    <div className="product-card glass-card product-card--skeleton" aria-hidden="true">
-      <div className="skeleton-block skeleton-block--image" />
-      <div className="product-card__content">
-        <span className="skeleton-block skeleton-block--title" />
-        <span className="skeleton-block skeleton-block--title skeleton-block--titleShort" />
-        <span className="skeleton-block skeleton-block--text" />
-        <span className="skeleton-block skeleton-block--price" />
-      </div>
-    </div>
   );
 }
