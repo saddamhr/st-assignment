@@ -1,40 +1,10 @@
 import { useEffect, useRef, useState } from 'react';
 import { AlertCircle, ChevronLeft, ChevronRight, Loader2, RefreshCw, Search } from 'lucide-react';
 import { ProductCard, ProductCardSkeleton } from './components/ProductCard';
-import { api } from './services/api';
+import { CATEGORIES, PAGE_SIZE } from './constants/catalog';
+import { fetchProductsWithRetry } from './services/productCatalog';
+import type { LoadPhase } from './types/catalog';
 import type { Product } from './types/product';
-
-const PAGE_SIZE = 12;
-const CATEGORIES = ['Electronics', 'Clothing', 'Home', 'Outdoors'];
-
-type LoadPhase = 'idle' | 'loading' | 'refreshing' | 'success' | 'error';
-
-function wait(ms: number) {
-  return new Promise(resolve => setTimeout(resolve, ms));
-}
-
-async function fetchProductsWithRetry(page: number, category: string, search: string) {
-  let lastError: Error | null = null;
-
-  for (let attempt = 0; attempt < 2; attempt += 1) {
-    try {
-      return await api.fetchProducts({
-        page,
-        limit: PAGE_SIZE,
-        category: category || undefined,
-        search: search || undefined,
-      });
-    } catch (error) {
-      lastError = error instanceof Error ? error : new Error('Unexpected error while fetching products.');
-
-      if (attempt === 0) {
-        await wait(450);
-      }
-    }
-  }
-
-  throw lastError ?? new Error('Unexpected error while fetching products.');
-}
 
 function App() {
   const requestIdRef = useRef(0);
