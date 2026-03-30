@@ -1,6 +1,8 @@
 import type { ProductCardProps } from '../types/productCard';
 import { formatPrice } from '../utils/formatPrice';
 
+import './ProductCard.css';
+
 export function ProductCard({ product }: ProductCardProps) {
   return (
     <article className="product-card glass-card">

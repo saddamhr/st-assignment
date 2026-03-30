@@ -7,6 +7,8 @@ import { Header } from '../components/Header';
 import { Pagination } from '../components/Pagination';
 import { useProducts } from '../hooks/useProducts';
 
+import './ProductsPage.css';
+
 export function ProductsPage() {
   const {
     category,
