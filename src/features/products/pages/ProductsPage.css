@@ -20,6 +20,8 @@
 
 .hero-panel__copy {
   color: var(--text-muted);
+  max-width: 60ch;
+  line-height: 1.6;
 }
 
 .controls-panel {
@@ -81,6 +83,10 @@
   border-radius: 14px;
   background: var(--button-bg);
   font-weight: 600;
+}
+
+.action-button {
+  white-space: nowrap;
 }
 
 .action-button:hover,
@@ -181,6 +187,7 @@
 .pagination-button--icon {
   min-width: 48px;
   padding-inline: 0;
+  flex: 0 0 48px;
 }
 
 .pagination-list {
@@ -242,7 +249,35 @@
   opacity: 0.45;
 }
 
+@media (max-width: 1024px) {
+  .page-shell {
+    padding: 1.5rem;
+  }
+
+  .controls-panel {
+    grid-template-columns: minmax(0, 1fr) minmax(180px, 220px) auto;
+  }
+
+  .product-grid {
+    justify-content: center;
+    gap: 20px;
+  }
+}
+
 @media (max-width: 900px) {
+  .page-shell {
+    padding: 1.25rem;
+  }
+
+  .hero-panel {
+    padding: 1.5rem;
+  }
+
+  .hero-panel__title {
+    font-size: 1.75rem;
+    line-height: 1.2;
+  }
+
   .controls-panel,
   .pagination-panel {
     grid-template-columns: 1fr;
@@ -254,7 +289,7 @@
   }
 
   .pagination-panel__actions {
-    justify-content: stretch;
+    justify-content: center;
     flex-wrap: wrap;
   }
 
@@ -264,6 +299,10 @@
     order: -1;
   }
 
+  .status-banner {
+    align-items: flex-start;
+  }
+
   .pagination-button {
     flex: 1;
   }
@@ -271,7 +310,7 @@
 
 @media (max-width: 640px) {
   .page-shell {
-    padding: 2rem;
+    padding: 1rem;
   }
 
   .hero-panel,
@@ -280,7 +319,98 @@
     padding: 14px;
   }
 
+  .hero-panel__title {
+    font-size: 1.5rem;
+  }
+
+  .hero-panel__copy {
+    font-size: 0.95rem;
+  }
+
+  .controls-panel {
+    gap: 12px;
+  }
+
+  .search-field,
+  .select-field,
+  .action-button {
+    width: 100%;
+  }
+
+  .status-banner {
+    gap: 8px;
+    padding: 12px 14px;
+  }
+
+  .pagination-panel__summary {
+    text-align: center;
+    align-items: center;
+  }
+
+  .pagination-panel__headline {
+    font-size: 0.9rem;
+    line-height: 1.5;
+  }
+
+  .pagination-panel__actions {
+    gap: 10px;
+  }
+
+  .pagination-list {
+    gap: 6px;
+  }
+
+  .pagination-pageButton {
+    min-width: 40px;
+    min-height: 40px;
+    padding: 0 10px;
+  }
+
   .product-grid {
     grid-template-columns: 210px;
+    justify-content: center;
+    gap: 18px;
+  }
+
+  .feedback-panel {
+    padding: 32px 18px;
+  }
+
+  .feedback-panel h2 {
+    font-size: 1.3rem;
+  }
+}
+
+@media (max-width: 420px) {
+  .page-shell {
+    padding: 0.75rem;
+  }
+
+  .hero-panel,
+  .controls-panel,
+  .pagination-panel {
+    padding: 12px;
+  }
+
+  .search-field,
+  .select-field,
+  .action-button,
+  .pagination-button {
+    min-height: 48px;
+  }
+
+  .pagination-button--icon {
+    flex-basis: 44px;
+    min-width: 44px;
+  }
+
+  .pagination-list {
+    gap: 4px;
+  }
+
+  .pagination-pageButton {
+    min-width: 36px;
+    min-height: 36px;
+    border-radius: 8px;
   }
 }
