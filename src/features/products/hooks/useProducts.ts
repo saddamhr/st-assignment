@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { fetchProductsWithRetry } from '../../../services/products';
+import { fetchProductsWithRetry, getCachedProducts } from '../../../services/products';
 import type { LoadPhase } from '../../../types/products';
 import type { Product } from '../../../types/product';
 import type { ProductsState } from '../types';
@@ -9,23 +9,53 @@ function getPendingLoadPhase(current: LoadPhase): LoadPhase {
 }
 
 export function useProducts(): ProductsState {
+  const initialCachedResponse = getCachedProducts(1, '', '');
+  const categoryRef = useRef('');
   const requestIdRef = useRef(0);
-  const [products, setProducts] = useState<Product[]>([]);
+  const [products, setProducts] = useState<Product[]>(initialCachedResponse?.data ?? []);
   const [category, setCategory] = useState('');
   const [searchInput, setSearchInput] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
   const [page, setPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(0);
-  const [loadPhase, setLoadPhase] = useState<LoadPhase>('loading');
+  const [totalPages, setTotalPages] = useState(initialCachedResponse?.totalPages ?? 0);
+  const [loadPhase, setLoadPhase] = useState<LoadPhase>(initialCachedResponse ? 'refreshing' : 'loading');
   const [errorMessage, setErrorMessage] = useState('');
   const [refreshKey, setRefreshKey] = useState(0);
 
   useEffect(() => {
+    categoryRef.current = category;
+  }, [category]);
+
+  const applyCachedProducts = (nextPage: number, nextCategory: string, nextSearch: string) => {
+    const cachedResponse = getCachedProducts(nextPage, nextCategory, nextSearch);
+
+    if (!cachedResponse) {
+      return false;
+    }
+
+    setProducts(cachedResponse.data);
+    setTotalPages(cachedResponse.totalPages);
+    setLoadPhase('refreshing');
+
+    return true;
+  };
+
+  useEffect(() => {
     const handle = window.setTimeout(() => {
-      setLoadPhase(getPendingLoadPhase);
+      const nextSearchQuery = searchInput.trim();
+      const cachedResponse = getCachedProducts(1, categoryRef.current, nextSearchQuery);
+
+      if (cachedResponse) {
+        setProducts(cachedResponse.data);
+        setTotalPages(cachedResponse.totalPages);
+        setLoadPhase('refreshing');
+      } else {
+        setLoadPhase(getPendingLoadPhase);
+      }
+
       setErrorMessage('');
       setPage(1);
-      setSearchQuery(searchInput.trim());
+      setSearchQuery(nextSearchQuery);
     }, 350);
 
     return () => window.clearTimeout(handle);
@@ -65,7 +95,10 @@ export function useProducts(): ProductsState {
   };
 
   const handleCategoryChange = (value: string) => {
-    setLoadPhase(getPendingLoadPhase);
+    if (!applyCachedProducts(1, value, searchQuery)) {
+      setLoadPhase(getPendingLoadPhase);
+    }
+
     setErrorMessage('');
     setCategory(value);
     setPage(1);
@@ -78,15 +111,25 @@ export function useProducts(): ProductsState {
   };
 
   const handlePreviousPage = () => {
-    setLoadPhase(getPendingLoadPhase);
+    const nextPage = Math.max(1, page - 1);
+
+    if (!applyCachedProducts(nextPage, category, searchQuery)) {
+      setLoadPhase(getPendingLoadPhase);
+    }
+
     setErrorMessage('');
-    setPage(currentPage => Math.max(1, currentPage - 1));
+    setPage(nextPage);
   };
 
   const handleNextPage = () => {
-    setLoadPhase(getPendingLoadPhase);
+    const nextPage = Math.min(totalPages, page + 1);
+
+    if (!applyCachedProducts(nextPage, category, searchQuery)) {
+      setLoadPhase(getPendingLoadPhase);
+    }
+
     setErrorMessage('');
-    setPage(currentPage => Math.min(totalPages, currentPage + 1));
+    setPage(nextPage);
   };
 
   const showEmptyState = loadPhase === 'success' && products.length === 0;
