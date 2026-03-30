@@ -17,6 +17,7 @@ export function useProducts(): ProductsState {
   const [searchInput, setSearchInput] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
   const [page, setPage] = useState(1);
+  const [totalItems, setTotalItems] = useState(initialCachedResponse?.total ?? 0);
   const [totalPages, setTotalPages] = useState(initialCachedResponse?.totalPages ?? 0);
   const [loadPhase, setLoadPhase] = useState<LoadPhase>(initialCachedResponse ? 'refreshing' : 'loading');
   const [errorMessage, setErrorMessage] = useState('');
@@ -34,6 +35,7 @@ export function useProducts(): ProductsState {
     }
 
     setProducts(cachedResponse.data);
+    setTotalItems(cachedResponse.total);
     setTotalPages(cachedResponse.totalPages);
     setLoadPhase('refreshing');
 
@@ -73,6 +75,7 @@ export function useProducts(): ProductsState {
         }
 
         setProducts(response.data);
+        setTotalItems(response.total);
         setTotalPages(response.totalPages);
         setLoadPhase('success');
       })
@@ -121,6 +124,19 @@ export function useProducts(): ProductsState {
     setPage(nextPage);
   };
 
+  const handlePageChange = (nextPage: number) => {
+    if (nextPage === page) {
+      return;
+    }
+
+    if (!applyCachedProducts(nextPage, category, searchQuery)) {
+      setLoadPhase(getPendingLoadPhase);
+    }
+
+    setErrorMessage('');
+    setPage(nextPage);
+  };
+
   const handleNextPage = () => {
     const nextPage = Math.min(totalPages, page + 1);
 
@@ -145,6 +161,7 @@ export function useProducts(): ProductsState {
     page,
     products,
     searchInput,
+    totalItems,
     totalPages,
     canGoNext: page < totalPages,
     canGoPrevious: page > 1,
@@ -155,6 +172,7 @@ export function useProducts(): ProductsState {
     showSoftError,
     handleCategoryChange,
     handleNextPage,
+    handlePageChange,
     handlePreviousPage,
     handleRetry,
     handleSearchInputChange,

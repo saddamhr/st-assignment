@@ -14,8 +14,11 @@ export type PaginationProps = {
   canGoPrevious: boolean;
   currentPage: number;
   isInitialLoading: boolean;
+  pageSize: number;
+  totalItems: number;
   totalPages: number;
   onNextPage: () => void;
+  onPageChange: (page: number) => void;
   onPreviousPage: () => void;
 };
 
@@ -26,6 +29,7 @@ export type ProductsState = {
   page: number;
   products: Product[];
   searchInput: string;
+  totalItems: number;
   totalPages: number;
   canGoNext: boolean;
   canGoPrevious: boolean;
@@ -36,6 +40,7 @@ export type ProductsState = {
   showSoftError: boolean;
   handleCategoryChange: (value: string) => void;
   handleNextPage: () => void;
+  handlePageChange: (page: number) => void;
   handlePreviousPage: () => void;
   handleRetry: () => void;
   handleSearchInputChange: (value: string) => void;

@@ -17,6 +17,7 @@ export function ProductsPage() {
     page,
     products,
     searchInput,
+    totalItems,
     totalPages,
     canGoNext,
     canGoPrevious,
@@ -27,6 +28,7 @@ export function ProductsPage() {
     showSoftError,
     handleCategoryChange,
     handleNextPage,
+    handlePageChange,
     handlePreviousPage,
     handleRetry,
     handleSearchInputChange,
@@ -101,8 +103,11 @@ export function ProductsPage() {
           canGoPrevious={canGoPrevious}
           currentPage={page}
           isInitialLoading={loadPhase === 'loading'}
+          pageSize={PAGE_SIZE}
+          totalItems={totalItems}
           totalPages={totalPages}
           onNextPage={handleNextPage}
+          onPageChange={handlePageChange}
           onPreviousPage={handlePreviousPage}
         />
       </div>
