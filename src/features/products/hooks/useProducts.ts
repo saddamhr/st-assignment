@@ -4,10 +4,6 @@ import type { LoadPhase } from '../../../types/products';
 import type { Product } from '../../../types/product';
 import type { ProductsState } from '../types';
 
-function getPendingLoadPhase(current: LoadPhase): LoadPhase {
-  return current === 'success' ? 'refreshing' : 'loading';
-}
-
 export function useProducts(): ProductsState {
   const initialCachedResponse = getCachedProducts({ page: 1, category: '', search: '' });
   const categoryRef = useRef('');
@@ -26,6 +22,13 @@ export function useProducts(): ProductsState {
   useEffect(() => {
     categoryRef.current = category;
   }, [category]);
+
+  const startLoadingWithoutCache = () => {
+    setProducts([]);
+    setTotalItems(0);
+    setTotalPages(0);
+    setLoadPhase('loading');
+  };
 
   const applyCachedProducts = (nextPage: number, nextCategory: string, nextSearch: string) => {
     const cachedResponse = getCachedProducts({
@@ -57,10 +60,11 @@ export function useProducts(): ProductsState {
 
       if (cachedResponse) {
         setProducts(cachedResponse.data);
+        setTotalItems(cachedResponse.total);
         setTotalPages(cachedResponse.totalPages);
         setLoadPhase('refreshing');
       } else {
-        setLoadPhase(getPendingLoadPhase);
+        startLoadingWithoutCache();
       }
 
       setErrorMessage('');
@@ -111,7 +115,7 @@ export function useProducts(): ProductsState {
 
   const handleCategoryChange = (value: string) => {
     if (!applyCachedProducts(1, value, searchQuery)) {
-      setLoadPhase(getPendingLoadPhase);
+      startLoadingWithoutCache();
     }
 
     setErrorMessage('');
@@ -120,7 +124,7 @@ export function useProducts(): ProductsState {
   };
 
   const handleRetry = () => {
-    setLoadPhase(getPendingLoadPhase);
+    startLoadingWithoutCache();
     setErrorMessage('');
     setRefreshKey(current => current + 1);
   };
@@ -129,7 +133,7 @@ export function useProducts(): ProductsState {
     const nextPage = Math.max(1, page - 1);
 
     if (!applyCachedProducts(nextPage, category, searchQuery)) {
-      setLoadPhase(getPendingLoadPhase);
+      startLoadingWithoutCache();
     }
 
     setErrorMessage('');
@@ -142,7 +146,7 @@ export function useProducts(): ProductsState {
     }
 
     if (!applyCachedProducts(nextPage, category, searchQuery)) {
-      setLoadPhase(getPendingLoadPhase);
+      startLoadingWithoutCache();
     }
 
     setErrorMessage('');
@@ -153,7 +157,7 @@ export function useProducts(): ProductsState {
     const nextPage = Math.min(totalPages, page + 1);
 
     if (!applyCachedProducts(nextPage, category, searchQuery)) {
-      setLoadPhase(getPendingLoadPhase);
+      startLoadingWithoutCache();
     }
 
     setErrorMessage('');

@@ -33,6 +33,7 @@ export function ProductsPage() {
     handleRetry,
     handleSearchInputChange,
   } = useProducts();
+  const productGridClassName = `product-grid${products.length < 9 ? ' product-grid--start' : ''}`;
 
   return (
     <div className="page-shell">
@@ -90,7 +91,7 @@ export function ProductsPage() {
           ) : null}
 
           {!showHardError && !showInitialLoader && !showEmptyState ? (
-            <section className="product-grid" aria-label="Product results">
+            <section className={productGridClassName} aria-label="Product results">
               {products.map(product => (
                 <ProductCard key={product.id} product={product} />
               ))}

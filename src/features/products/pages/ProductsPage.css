@@ -134,6 +134,10 @@
   width: 100%;
 }
 
+.product-grid--start {
+  justify-content: start;
+}
+
 .feedback-panel {
   display: grid;
   justify-items: center;
