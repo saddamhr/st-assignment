@@ -1,14 +1,15 @@
 import { PAGE_SIZE, PRODUCT_FETCH_RETRY_ATTEMPTS, PRODUCT_FETCH_RETRY_DELAY_MS } from '../constants/products';
-import { api } from './api';
+import type { ProductsQuery } from '../types/products';
 import type { PaginatedResponse, Product } from '../types/product';
+import { wait } from '../utils/wait';
+import { api } from './api';
 
 const productsCache = new Map<string, PaginatedResponse<Product>>();
 
-function wait(ms: number) {
-  return new Promise(resolve => setTimeout(resolve, ms));
-}
-
-export function getProductsCacheKey(page: number, category: string, search: string) {
+/**
+ * Creates a stable cache key for a specific products query.
+ */
+function createProductsCacheKey({ page, category, search }: ProductsQuery) {
   return JSON.stringify({
     page,
     category: category || '',
@@ -16,11 +17,20 @@ export function getProductsCacheKey(page: number, category: string, search: stri
   });
 }
 
-export function getCachedProducts(page: number, category: string, search: string) {
-  return productsCache.get(getProductsCacheKey(page, category, search));
+/**
+ * Returns a cached products response when the same page/filter/search query
+ * has already been fetched in the current session.
+ */
+function getCachedProducts(query: ProductsQuery) {
+  return productsCache.get(createProductsCacheKey(query));
 }
 
-export async function fetchProductsWithRetry(page: number, category: string, search: string) {
+/**
+ * Fetches products with a small retry strategy to absorb transient failures
+ * from the intentionally slow and flaky API. Successful responses are cached
+ * in memory by query key.
+ */
+async function fetchProductsWithRetry({ page, category, search }: ProductsQuery) {
   let lastError: Error | null = null;
 
   for (let attempt = 0; attempt < PRODUCT_FETCH_RETRY_ATTEMPTS; attempt += 1) {
@@ -32,7 +42,7 @@ export async function fetchProductsWithRetry(page: number, category: string, sea
         search: search || undefined,
       });
 
-      productsCache.set(getProductsCacheKey(page, category, search), response);
+      productsCache.set(createProductsCacheKey({ page, category, search }), response);
 
       return response;
     } catch (error) {
@@ -46,3 +56,5 @@ export async function fetchProductsWithRetry(page: number, category: string, sea
 
   throw lastError ?? new Error('Unexpected error while fetching products.');
 }
+
+export { createProductsCacheKey, getCachedProducts, fetchProductsWithRetry };

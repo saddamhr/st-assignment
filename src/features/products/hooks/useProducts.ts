@@ -9,7 +9,7 @@ function getPendingLoadPhase(current: LoadPhase): LoadPhase {
 }
 
 export function useProducts(): ProductsState {
-  const initialCachedResponse = getCachedProducts(1, '', '');
+  const initialCachedResponse = getCachedProducts({ page: 1, category: '', search: '' });
   const categoryRef = useRef('');
   const requestIdRef = useRef(0);
   const [products, setProducts] = useState<Product[]>(initialCachedResponse?.data ?? []);
@@ -28,7 +28,11 @@ export function useProducts(): ProductsState {
   }, [category]);
 
   const applyCachedProducts = (nextPage: number, nextCategory: string, nextSearch: string) => {
-    const cachedResponse = getCachedProducts(nextPage, nextCategory, nextSearch);
+    const cachedResponse = getCachedProducts({
+      page: nextPage,
+      category: nextCategory,
+      search: nextSearch,
+    });
 
     if (!cachedResponse) {
       return false;
@@ -45,7 +49,11 @@ export function useProducts(): ProductsState {
   useEffect(() => {
     const handle = window.setTimeout(() => {
       const nextSearchQuery = searchInput.trim();
-      const cachedResponse = getCachedProducts(1, categoryRef.current, nextSearchQuery);
+      const cachedResponse = getCachedProducts({
+        page: 1,
+        category: categoryRef.current,
+        search: nextSearchQuery,
+      });
 
       if (cachedResponse) {
         setProducts(cachedResponse.data);
@@ -68,7 +76,11 @@ export function useProducts(): ProductsState {
     const requestId = requestIdRef.current + 1;
     requestIdRef.current = requestId;
 
-    fetchProductsWithRetry(page, category, searchQuery)
+    fetchProductsWithRetry({
+      page,
+      category,
+      search: searchQuery,
+    })
       .then(response => {
         if (!active || requestId !== requestIdRef.current) {
           return;
